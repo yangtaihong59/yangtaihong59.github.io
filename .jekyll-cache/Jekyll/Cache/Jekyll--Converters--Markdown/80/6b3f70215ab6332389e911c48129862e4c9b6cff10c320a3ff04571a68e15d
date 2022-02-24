@@ -1,4 +1,4 @@
-I"8�<h1 id="ssd单发多分类检测算法">SSD：单发多分类检测算法</h1>
+I"ߜ<h1 id="ssd单发多分类检测算法">SSD：单发多分类检测算法</h1>
 
 <h2 id="摘要">摘要</h2>
 
@@ -56,17 +56,13 @@
 $$
 L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha L_{loc}(x,l,g)) \tag1
 $$
-其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。</p>
-
-<p>$$
-L_{loc}(x,l,g)=\sum^N_{i\in Pos}\sum_{m\in{cx,cy,w,h}}x^k_{ij}smooth_{L1}(l^m_i-\hat{g}^m_j)<br />
-\hat{g}^{cx}_j=(g^{cx}_j-d^{cx}_i)/d^w_i \qquad \hat{g}^{cy}_j=(g^{cy}_j-d^{cy}_i)/d^h_i<br />
-\hat{g}^w_j=log(\frac{g^w_j}{d^w_i}) \qquad \hat{g}^h_j=log(\frac{g^h_j}{d^h_i}) \tag2
-$$</p>
+其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。<img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" /></p>
 
 <p>置信损失函数是多个种类的softmax损失函数$(c)$。</p>
 
-<p><img src="https://ae05.alicdn.com/kf/Hcd5c79cafdce4fb7969d241951815152u.png" alt="image-20220223213343962.png" title="image-20220223213343962.png" /></p>
+<p>$$
+L_{conf}(x,c)=-\sum^{N}<em>{i\in Pos}x^p</em>{ij}log(\hat{c}^p_i)-\sum_{i\in Neg}log(\hat{c}^0_i)\quad \textsf{where} \quad \hat{c}^p_i=\frac{\textsf{exp}(c^p_i)}{\sum_p\textsf{exp}(x^p_i)}\tag3
+$$</p>
 
 <p>并且通过交叉验证将权重项α设置为1。</p>
 
@@ -75,7 +71,7 @@ $$</p>
 <p>已知网络中不同级别的特征图具有不同的感受域大小[13]。幸运的是在SSD框架内，默认框不一定需要与每层的实际感知内容相对应。我们令默认框平铺在图像上，以便特征图学习响应特定的对象尺度。假设我们想要使用m个特征映射进行预测。 每个要素图的默认框的比例计算为：</p>
 
 <p>$$
-s_k=s_{min}+\frac{s_{max}-s_{min}}{m-1}(k-1),k\in[1,m]\tag4
+s_k=s_{min}+\frac{s_{max}-s_{min}}{m-1}(k-1),\quad k\in[1,m]\tag4
 $$
 令$s_{min}$ 为0.2，$s_{max}$为0.9，意味着最低层的尺度为0.2倍，最高层的尺度为0.9倍，其间所有层按规则间隔。我们对默认框施加不同的宽高比，并将它们表示为$a_r\in{{1,2,3,\frac{1}{2},\frac{1}{3}}}$ 。我们可以计算出各个默认框的宽$ (w_k^a=s_k\sqrt{a_r})$和高$(h_k^a=s_k/\sqrt{a_r})$。对于宽高比为1时，我们也添加尺度为$(s_k^{\prime}=\sqrt{s_ks_{k+1}})$ 的默认框，这样特征图每个位置生成6个默认框。令每个默认框中心位置为$(\frac{i+0.5}{|f_k|},\frac{j+0.5}{|f_k|})$  其中$|f_k|$是第k个特征图的大小，$i,j\in(0,|f_k|)$ 。实际上，可以设计一种默认框的分布以最佳地适应一种特定数据集。但如何设计最佳分布也是一个未定的问题。</p>
 

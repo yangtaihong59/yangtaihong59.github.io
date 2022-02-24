@@ -1,4 +1,4 @@
-I"q�<h1 id="ssd单发多分类检测算法">SSD：单发多分类检测算法</h1>
+I"ל<h1 id="ssd单发多分类检测算法">SSD：单发多分类检测算法</h1>
 
 <h2 id="摘要">摘要</h2>
 
@@ -56,17 +56,10 @@
 $$
 L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha L_{loc}(x,l,g)) \tag1
 $$
-其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。</p>
+其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。<img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" /></p>
 
-<p>$$
-L_{loc}(x,l,g)=\sum^N_{i\in Pos}\sum_{m\in{cx,cy,w,h}}x^k_{ij}smooth_{L1}(l^m_i-\hat{g}^m_j)<br />
-\hat{g}^{cx}_j=(g^{cx}_j-d^{cx}_i)/d^w_i \qquad \hat{g}^{cy}_j=(g^{cy}_j-d^{cy}_i)/d^h_i<br />
-\hat{g}^w_j=log(\frac{g^w_j}{d^w_i}) \qquad \hat{g}^h_j=log(\frac{g^h_j}{d^h_i}) \tag2
-$$</p>
-
-<p>置信损失函数是多个种类的softmax损失函数$(c)$。</p>
-
-<p>$$
+<p>置信损失函数是多个种类的softmax损失函数$(c)$。
+$$
 L_{conf}(x,c)=-\sum^{N}<em>{i\in Pos}x^p</em>{ij}log(\hat{c}^p_i)-\sum_{i\in Neg}log(\hat{c}^0_i)\quad \textsf{where} \quad \hat{c}^p_i=\frac{\textsf{exp}(c^p_i)}{\sum_p\textsf{exp}(x^p_i)}\tag3
 $$</p>
 
