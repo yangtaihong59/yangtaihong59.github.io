@@ -1,0 +1,241 @@
+I"��<h1 id="ssd单发多分类检测算法">SSD：单发多分类检测算法</h1>
+
+<h2 id="摘要">摘要</h2>
+
+<p>我们提出了一种基于单个深度神经网络的图像目标检测方法。我们的方法命名为SSD，将边界框的输出空间离散化为不同长宽比的一组默认框和并缩放每个特征映射的位置。在预测的时候，网络在每个默认框中存为每个对象类别生成分数，并对框进行调整以更好地匹配目标形状。此外该网络结合了不同分辨率的多个特征映射的预测，以自然地处理不同大小的目标。SSD相比于需要似物性采样的模型更加简单，因为它完全消除了似物性采样和后续的像素与特征重采样阶段，并将所有计算封装到单个网络中。这使得SSD易于训练并直接集成到需要检测组件的系统中。在PASCALVOC、COCO和ILSVRC数据集上的实验结果证实，SSD相比利用了额外的似物性采样步骤的模型，体现了具有有竞争力的准确性，并且速度快得多，同时为训练和推理提供了一个统一的框架。对于300×300的输入，SSD在NVIDIA TitanX上59 FPS的VOC2007测试中获得了74.3%的mAP1，对于512×512的输入，SSD获得了76.9%的MAP，超过了与之相当的最先进的更快的R-CNN模型。与其他单级方法相比，即使在较小的输入图像尺寸下，SSD也具有更高的精度。代码可在以下网址获得：https://github.com/weiliu89/caffe/tree/ssd。</p>
+
+<h2 id="关键词">关键词</h2>
+
+<p>市室物体检测；卷积神经网络</p>
+
+<h2 id="1-介绍">1 介绍</h2>
+
+<p>当前高水平的目标检测系统都是以下方法的变体：假设边界框，对每个框的像素或特征进行重采样，并应用高质量的分类器。自从选择性搜索[1]通过在PASCAL VOC，COCO和ILSVRC上所有基于Faster R-CNN[2]的检测都取得了当前领先的结果（尽管具有更深的特征如[3]），这种流程在检测基准数据上流行开来。这些方法虽然准确，但对于嵌入式系统来说计算量过大，即使是高端硬件，对于实时应用来说也太慢了。通常，这些方法的检测速度是以秒/帧(SPF)度量，即使是最快的高精度检测器，Faster R-CNN，也只在7帧/秒(FPS)下工作。已经有很多尝试通过处理检测流水线的每个阶段来构建更快的检测器(参见Sec.4中的相关工作)。4)，但到目前为止，速度的显著提高只能以显著降低检测精度为代价。</p>
+
+<p>本文提出了第一个基于深度网络的目标检测器，它不需要对边界框假设的像素或特征进行重采样，并且与其他方法一样精确。这显著提升了高精度检测的速度(在VOC2007测试中，59FPS的MAP为74.3%，与 Faster R-CNN 7FPS的MAP为73.2%或YOLO 45FPS的MAP为63.4%)。速度上的根本改进来自于取消边界框似物性采样和随后的像素或特征重采样阶段。我们并不是第一个这样做的人(参见[4，5])，但通过增加一系列改进，我们设法比以前的试验显著提高了准确度。我们的改进包括使用一个小的卷积滤波器来预测边界框位置中的目标类别和偏移量，为不同的长宽比检测使用单独的预测器(滤波器)，并将这些滤波器应用于网络后期的多个特征映射中，以便在多个尺度上执行检测。有了这些改进-特别是使用多层进行不同尺度的预测-我们可以在相对较低的分辨率输入下实现高精度，进一步提高检测速度。虽然这些贡献可能单独地看起来很小，但我们注意到，最终的系统提高了PASCAL VOC实时检测的准确率，从YOLO的63.4%提高到我们的SSD的74.3%。相比于最近关于非常引人注目的残差网络方面的工作，这在检测精度上有了相对较大的提高[3]。此外，显著提升质量检测的速度可以拓宽计算机视觉的应用范围。</p>
+
+<p>我们的贡献总结如下：</p>
+
+<ul>
+  <li>我们提出了SSD算法，这是一种单向多酚类检测短发，它比以前的最先进的单向检测器(YOLO)更快，精度更高，实际上可以媲美速度较慢精度较高候选区域和池化技术(包括Faster R-CNN)。</li>
+  <li>SSD的核心是使用应用于特征映射的小卷积滤波器来预测一组固定默认边界框的中类别得分和框的偏移量。</li>
+  <li>为了达到较高的检测精度，我们从图片的不同尺度的特征映射中产生不同尺度的预测，并按纵横比显式分离预测。</li>
+  <li>这些特点使在输入低分辨率图像是，也能实现简单的端到端训练和高精度，进一步提高了速度与精度的权衡。</li>
+  <li>实验包括多种输入大小，在Pascal VOC、COCO和ILSVRC上评估模型的实时和精度，并将其与各种最新的方法进行比较。</li>
+</ul>
+
+<h2 id="2--the-single-shot-detectorssd">2  The Single Shot Detector（SSD）</h2>
+
+<p>本节介绍我们提出的SSD检测框架（Sec.2.1）和相关的训练方法（Sec.2.2）.之后在Sec.3给出了特定于数据集的模型细节和实验结果。</p>
+
+<p><img src="https://ae02.alicdn.com/kf/Hac64aa1b25904cb3b0b0161af3c2b29cE.png" alt="image-20220223205205032-16456245723101.png" title="image-20220223205205032-16456245723101.png" /></p>
+
+<p>图片1：<strong>SSD框架</strong> （a）SSD 训练只需要输入图像和每个目标的真实框。通过卷积的方式，在不同尺度的若干个特征图中，设置一组（例如四个）不同长宽比的默认框（例如 $8\times8$ 和 $4\times4$  在图（b）和（c）中）。对于每个默认框，我们预测所有目标类别((c~1~，c~2~，···，c~p~))的形状偏移量和置信度。在训练时，我们首先将这些默认框与真实框匹配。例如，我们依据将两个默认框与猫和狗匹配，哪一个被认为是好的然后身下的被认为是不好的。这个模型的损失函数是定位损失函数（例如 Smooth L1 [6]）和置信度损失函数的加权和（例如 Softmax）。</p>
+
+<h3 id="21-模型">2.1 模型</h3>
+
+<p>SSD方法基于前馈卷积网络，该网络产生固定大小的边界框集合，以及这些边界框中存在的对象类实例的分数，然后进行非最大抑制步骤以完成最终检测。前段网络基于标准的结构用于高质量图像分类(阶段分类层之前)，我们称之为基本网络^2^。然后，我们将辅助结构添加到网络中，以进行具有以下关键特征的检测：</p>
+
+<p><strong>检测多尺度图片特征</strong>  我们在截断的基本网络的末端增加了卷积特征层。这些层的大小逐渐减小，并允许在多个尺度上进行检测预测。用于预测检测的卷积模型对于每个特征层是不同的(参见 OVERFEAT[4]和YOLO[5]，在单个尺度的特征图上操作)。</p>
+
+<p><strong>卷积定位预测</strong> 每个添加的特征层 (或选取基础网络的已有特征层) 可以通过一组卷积滤波器来生成一组固定的检测结果。这些位于图2中SSD网络架构的顶部。对于具有p个通道的大小为m×n的特征层，用于预测潜在检测参数的基本元素是3×3×p小核，该小核产生类别的分数和相对于默认框坐标的偏移。在m×n每个位置中都应用这个核，由它产生输出值。边界框的位置根据每幅特征图上默认框的位置进行补偿（参照YOLO [5]的结构，该结构中间使用完全连接层而不是卷积滤波器）。</p>
+
+<p><strong>默认框和高宽比</strong>：对网络顶层的多个特征图，我们将一组默认边界框与每个特征图单元关联。默认框以卷积方式平铺特征图，以便每个框位置相对其对应单元是固定的。在每个特征图单元中，我们预测单元中相对于默认框形状的偏移量，以及反应每个框中存在的检测物体种类的得分。特别地，对于每个位置的K个框，我们分别计算c种类别的得分和相对于原始默认框形状的4个偏移。其结果是在特征图中的每个位置有（c + 4）×k个滤波器，在m×n特征图上生成的（c + 4）×k×m×n个输出。有关默认框的说明，请参阅图1。文中所提到的默认框类似于Faster R-CNN中的<em>anchor boxes</em>，我们将这些默认框应用于不同分辨率的多个特征图上。允许在多个特征图中使用不同的默认框形状，可以有效地离散输出框空间形状。</p>
+
+<p><img src="https://ae05.alicdn.com/kf/H9ae3a3509c1149fd8eae7216d149cc2bO.png" alt="image-20220223205828240-16456245723112.png" title="image-20220223205828240-16456245723112.png" /></p>
+
+<p>图2：两个单向检测模型之间的比较：SSD和YOLO[5]。我们的SSD模型在到基础网之后添加了几个特征层，用于预测不同尺度、宽高比的默认框补偿量和它们相关的置信度。在VOC2007数据集上，SSD在300×300输入时测量的精度明显优于以448×448作为输入的YOLO，同时还提升了速度。</p>
+
+<h3 id="22-训练">2.2 训练</h3>
+
+<p>训练SSD和传统的需要候选区域的检测器区别之处在于需要将实际区域的信息分配给特定的输出，一些版本的YOLO和Faster R-CNN也需要生成对应候选区域的步骤进行训练。一旦确定对应关系后，损失函数和反向传播可应用于端到端的训练。训练还涉及根据尺度选择默认框以及负样本挖掘和数据增强策略。</p>
+
+<p><strong>匹配策略：</strong>在训练期间，我们需要决定默认框和检测的真实物体的对应关系并以此训练网络。对于每个真实物体我们选择不同位置、宽高比和尺度的框体与之匹配。我们将每个真实框和默认框匹配计算交并比（如MultiBox[7]）。不像MultiBox那样，我们选择默认框与真实框交并比例大于0.5的样本，这样可以简化问题，允许网络预测出多个具有高分的重叠默认框，而不是要求它仅选择具有最大重叠的框。</p>
+
+<p><strong>检测训练：</strong>SSD的训练是由MultiBox派生出来的，但它已经发展到能够处理多种类物体。设定$x_{ij}^{p}={1,0}$表示第$i$个默认框和第$j$个真实框对于种类$p$是否匹配。根据以上的匹配策略我们可以得到 $\sum_ix_{ij}^p\ge1$ 。总的损失函数是位置损失函数（loc）和置信损失函数（conf）权重之和：
+$$
+L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha L_{loc}(x,l,g)) \tag1
+$$
+其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。</p>
+
+<p><img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" /></p>
+
+<p>置信损失函数是多个种类的softmax损失函数$(c)$。</p>
+
+<p><img src="https://ae05.alicdn.com/kf/Hcd5c79cafdce4fb7969d241951815152u.png" alt="image-20220223213343962.png" title="image-20220223213343962.png" /></p>
+
+<p>并且通过交叉验证将权重项α设置为1。</p>
+
+<p><strong>选择默认框的尺度和宽高比：</strong>为了处理不同尺度的物体，一些方法[4,9]建议以不同的尺寸处理图像再整合结果。但是，通过利用单个网络中不同层的特征图进行预测，我们可以模拟出相同的效果，同时还可以跨所有对象尺度共享数据。之前的成果[10,11]已经表明，使用较低层的特征图可以提高语义分割质量，因为较低层可以捕获输入对象更多的细节。同样[12]表明，从特征图中添加整体内容可以帮助平滑分割结果。受这种思想的鼓励，我们用低层和高层特征图一起预测。图1显示了用同一框架中两个特征映射（$8\times8$和$4\times4$）的例子。实际上，我们可以以较少的开销而使用更多种映射关系。</p>
+
+<p>已知网络中不同级别的特征图具有不同的感受域大小[13]。幸运的是在SSD框架内，默认框不一定需要与每层的实际感知内容相对应。我们令默认框平铺在图像上，以便特征图学习响应特定的对象尺度。假设我们想要使用m个特征映射进行预测。 每个要素图的默认框的比例计算为：</p>
+
+<p>$$
+s_k=s_{min}+\frac{s_{max}-s_{min}}{m-1}(k-1),k\in[1,m]\tag4
+$$
+令$s_{min}$ 为0.2，$s_{max}$为0.9，意味着最低层的尺度为0.2倍，最高层的尺度为0.9倍，其间所有层按规则间隔。我们对默认框施加不同的宽高比，并将它们表示为$a_r\in{{1,2,3,\frac{1}{2},\frac{1}{3}}}$ 。我们可以计算出各个默认框的宽$ (w_k^a=s_k\sqrt{a_r})$和高$(h_k^a=s_k/\sqrt{a_r})$。对于宽高比为1时，我们也添加尺度为$(s_k^{\prime}=\sqrt{s_ks_{k+1}})$ 的默认框，这样特征图每个位置生成6个默认框。令每个默认框中心位置为$(\frac{i+0.5}{|f_k|},\frac{j+0.5}{|f_k|})$  其中$|f_k|$是第k个特征图的大小，$i,j\in(0,|f_k|)$ 。实际上，可以设计一种默认框的分布以最佳地适应一种特定数据集。但如何设计最佳分布也是一个未定的问题。</p>
+
+<p>通过结合多种特征图的不同位置、不同尺度和纵横比的所有默认框预测，我们得到多种预测结果，包含各种输入大小和形状。例如在图1中，狗可以匹配$4\times4$特征图中的默认框，但不匹配$8\times8$特征图中的任何默认框。这是因为这些具有不同尺度的框体与狗的形状不匹配，因此在训练期间被认为是负样本。</p>
+
+<p><strong>难例挖掘</strong> 在匹配步骤结束后，大部分默认框使负例，特别是当默认框数量很大时。这些引发了训练的正例和负例之间严重的不平衡。不同于使用所有负例，我们晒窜其中置信度高的部分默认框，是的正例和负例之比在3：1。我们发现这样可以更快速得优化且训练更加稳定。</p>
+
+<p><strong>数据扩增</strong> 为了让模型在输入不同尺寸、形状得目标时更加健壮，通过一下选项之一随机采样每个训练图像：</p>
+
+<ul>
+  <li>
+    <p>使用原始图像。</p>
+  </li>
+  <li>采样一个部分和对象最小得jaccard重叠为0.1，0.3，0.5，0.7或0.9</li>
+  <li>随机采样一个部分</li>
+</ul>
+
+<p>每个采样快为初试大小的$[0.1,1]$,长宽比在$\frac{1}{2}$和$2$之间。如果真实框的中心在采样快中，就保留真实框重叠的部分。在完成了上述的采样过程后，每个采样块被调整到固定大小，并病以0.5的概率水平翻转，此外还应用了一些类似于[14]中描述的框度量失真方法进行扩增。</p>
+
+<h2 id="3-实验结果">3 实验结果</h2>
+
+<p><strong>基础网络</strong> 我们的实验都是基于VGG16[15]的，它是在ILSVRC CLS-LOC数据集[16]上预训练的。类似于DeepLab-LargeFOV[17]，我们将fc6和fc7转换为卷积层，从fc6和fc7重采样参数，将 pool5 从2×2−S2转换到3×3−S1，并使用‘a Trous算法[18]来填补这个“洞”。我们去掉了所有的退出层和fc8层。我们使用SGD微调了结果模型，初始学习率为10−3，动量为0.9，重量衰减为0.0005，批次大小为32。每个数据集的学习率衰减策略稍有不同，我们将在稍后描述详细信息。完整的训练和测试代码构建在Caffe[19]上，并且是开源的，网址是：https://github.com/weiliu89/caffe/tree/ssd。</p>
+
+<h3 id="31-pascal-voc2007">3.1 PASCAL VOC2007</h3>
+
+<p>在此数据集上，我们在VOC2007test(4952张图像)上与Fast R-CNN[6]和Faster R-CNN[2]进行了比较。所有方法都在同一个预先训练的VGG16网络上进行微调。</p>
+
+<p>图2展示了SSD300模型详细架构。我们使用了conv4_3,conv7 (fc7), conv8_2, conv9_2, conv10_2, 和 conv11_2 来预测位置与置信度信息。我们用conv4_3^[3]^设置了比例为0.1的默认框。我们用“Xavier”方法[20]初始化所有新添加的卷积层的参数。对于Conv4 3、Con10 2和Conv11 2，我们只在每个要素地图位置关联4个默认框-省略长宽比$\frac{1}{3}$和3。对于其它层，如Sec.2.2中所述，我们设置了6个默认框。正如文献[12]中指出的那样，conv4_3和其它曾想不有不同的特征尺度，我们使用文献[12]中介绍的L2归一化技术特征映射中每个位置的特征范数缩放到20，并在反向传播过程中学习该尺度。我们使用$10^{-3}$的学习率进行40k次迭代，然后用$10^{−4}$和$10^{−5}$继续训练10k次迭代。在VOC2007 trainval上进行训练时，表1显示我们的低分辨率SSD300模型已经比Fast R-CNN更精确。当我们在更大的512×512输入图像上训练SSD时，它的准确率甚至更高，比Faster R-CNN 在 mAP 上显著提升1.7%。如果我们用更多(即07+12)数据训练SSD，我们会发现SSD300已经比Faster R-CNN好了1.1%，SSD512比Faster R-CNN好了3.6%。如果我们采用在Sec.3.4中描述的COCO trainval35上训练的模型，并用SSD512在07+12数据集上进行微调，得到了最好的结果：81.6% MAP。</p>
+
+<p>为了更详细地了解我们两个SSD模型的性能，我们使用了[21]中的检测分析工具。图3显示，SSD可以高质量地检测各种对象类别(包括存在大面积白色区域的情况)。它的大多数置信度检测都是正确的。召回率在85-90%左右，如果采用“弱”(0.1 jaccard overlap)标准，召回率要高得多。与R-CNN[22]相比，SSD具有较小的定位误差，表明SSD可以更好地定位目标，因为它直接学习回归目标形状和分类目标类别，而不是使用两个解耦的步骤。然而，SSD对类似的物体类别(尤其是动物)更容易混淆，部分原因是我们共享多个类别的位置。图4显示SSD对边界框大小非常敏感。换而言之，它在较小对象上的性能比在较大对象上差得多。这并不令人惊讶，因为那些小物体可能在最顶层甚至没有任何信息。增加输入大小(例如，从300×300增加到512×512)有助于改进对小对象的检测，但仍有很大的改进空间。从积极的一面来看，我们可以清楚地看到，SSD在大型对象上表现得非常好。而且它对不同的对象长宽比非常健壮，因为我们在每个要素图位置使用各种长宽比的默认框。</p>
+
+<p><img src="https://ae01.alicdn.com/kf/Hf32fba8e753c4275a3cc37aa57bd5982U.png" alt="image-20220223213526999.png" title="image-20220223213526999.png" /></p>
+
+<p>表1： <strong>PASCAL VOC2007 test 检测结果</strong> Fast 和 Faster R-CNN都使用了最小尺寸为600的输入图像。 这两个SSD模型的设置完全相同，只是它们的输入大小不同(300×300比512×512)。很明显，更大的输入大小会带来更好的结果，且更多的数据总是有帮助的。数据：”07”: VOC2007 trainval, ”07+12”:  VOC2007 和 VOC2012 trainval的联合。”07+12+COCO”: 先在 COCO trainval35上训练，再再 07+12上微调。</p>
+
+<h3 id="32-模型分析">3.2 模型分析</h3>
+
+<p>为了更好的理解SSD，我们做了对照实验，来检查每个组件如何影响性能。对于所有实验，我们使用相同的设置和输入大小(300×300)，但对特定的设置或组件进行了更改。</p>
+
+<p><img src="https://ae01.alicdn.com/kf/He079bb3c6fcb4c3d87d6f5ab902fafcbY.png" alt="image-20220223213556979.png" title="image-20220223213556979.png" /></p>
+
+<p>表2：<strong>各种设计选择和组件对SSD性能的影响</strong></p>
+
+<p><strong>数据扩增是一项艰巨的任务</strong> Fast、Faster R-CNN使用原始图像和水平翻转进行训练。我们使用了类似于YOLO[5]的更广泛的抽样策略。表2显示，使用此抽样策略，我们可以提高8.8%的MAP。我们不知道我们的采样策略将对Fast和Faster R-CNN产生多大的提升，但它们可能提升较少，因为它们在分类过程中使用了一个特征池化步骤，该步骤在设计上对对象转换相对健壮。</p>
+
+<p><img src="https://ae03.alicdn.com/kf/H88e4f94985d4446f89d6ebae24ad8053O.png" alt="image-20220223213716644.png" title="image-20220223213716644.png" /></p>
+
+<p>图3：<strong>SSD512在 VOC2007 test 中动物、车辆和家具上的性能可视化</strong>第一行的图表示了检测的累计分数，由于不佳的localization (Loc)是 correct (Cor) or false positive 的，混合了similar categories (Sim), 和 others (Oth), 或者和 background (BG).实线红线反映了随着检测次数的增加，具有较强标准(0.5 jaccard overlap)的召回的变化虚线红线使用的是弱标准(0.1 Jaccardoverap)。最下面一行显示排名靠前的假正类型的分布。</p>
+
+<p><img src="https://ae04.alicdn.com/kf/H6a41d23a8c334ff889bb2ca84fb90b19S.png" alt="image-20220223213756067.png" title="image-20220223213756067.png" /></p>
+
+<p>图4：<strong>使用文献[21]方法对不同对象特性对VOC2007测试集的灵敏度和影响评价图</strong> 左边的图显示每个类别的边框面积的影响，右边的图显示纵横比的影响。键：BBox 面积：XS=超小；S=小；M=中；L=大；XL=超大。纵横比：XT=超高/超窄；T=高；M=中等；W=宽；XW=超宽。</p>
+
+<p><strong>默认框形状越多越好</strong> 如Sec.2.2所描述的，默认情况下，每个位置使用6个默认框。如果我们去掉长宽比为$\frac{1}{3}$和3的盒子，性能会下降0.6%。通过进一步去掉长宽比为$\frac{1}{2}$和2的框，性能又下降了2.1%。对于网络来说，使用各种形状的默认框似乎可以使网络预测框的任务变得更容易。</p>
+
+<p><strong>Atrous更快</strong>  如Sec.3描述的，继DefcepLab-LargeFOV[17]之后，我们使用了由VGG6二次采样的Atrouss版。如果我们使用整个VGG16，保留pool5为2×2-s2，不使用来自fc6和fc7的二次采样参数，并加上conv5_3进行预测，结果大致相同，但速度降低了约20%。</p>
+
+<p><img src="https://ae01.alicdn.com/kf/H82bb527c1a94441b8964853ad3eea580C.png" alt="image-20220223213825680.png" title="image-20220223213825680.png" /></p>
+
+<p>表3：<strong>使用多输出层的影响</strong></p>
+
+<p><strong>使用不同分辨率的多个输出图层结果更好</strong> SSD的一个主要贡献在于在不同的输出层上使用不同比例的默认框。为了衡量获得的优势，我们逐步去除层并比较结果。为了进行公平比较，每次我们删除一个图层时，我们都会调整默认框的铺设，以保持框的总数与原始一致(8732)。这是通过在剩余图层上堆叠更多比例的长方体并根据需要调整长宽比来实现的。我们没有对每个设置的铺设进行详尽的优化。表3显示了层数较少时精度的下降，从74.3单调递减至62.4。当我们在一个图层上堆叠多个长宽比的框时，很多框都在图像边界上，需要小心处理。我们尝试了在Faster R-CNN[2]中使用的策略，忽略了边界上的方框。我们观察到一些有趣的趋势。例如，如果我们使用非常粗糙的特征映射(例如，conv11_2(1×1)或conv10_2(3×3))，则会对性能造成很大的影响。其原因可能是在修剪之后，我们没有足够的大箱子来覆盖大的物体。当我们主要使用更精细分辨率图时，性能会再次开始提高，因为即使在修剪完之后，仍会保留足够数量的大长方体。如果我们只使用Conv7进行预测，则性能最差，这强化了这样一个信息，即在不同的层上分布不同比例的框是至关重要的。此外，由于我们的预测不像[6]中那样依赖于ROI池，我们在低分辨率特征图中不存在collapsing bins问题[23]。SSD架构结合了来自不同分辨率的特征图的预测，在使用较低分辨率的输入图像的同时，实现了与Faster R-CNN相当的准确性。</p>
+
+<h3 id="33-pascal-voc2012">3.3 PASCAL VOC2012</h3>
+
+<p>除了使用VOC 2012trainval和VOC 2007trainval和VOC2007trainval和test(21503个图像)进行训练，以及在VOC 2012test(10991个图像)上进行测试之外，我们使用的设置与上面的VOC 2007的基础实验使用的设置相同。我们用$10^{−3}$的学习率训练60k次的模型，然后用$10^{−4}$的学习率训练20k次的模型。表4展示了我们的SSD300和SSD512^4^模型的结果。我们看到的性能趋势与我们在VOC2007测试中观察到的相同。我们的SSD300 比Fast/Faster R-CNN 提高了准确性。通过将训练和测试图像大小增加到512×512，我们的准确率比Faster R-CNN提高了4.5%。与YOLO相比，SSD的精确度要高得多，这可能是因为在训练期间使用了来自多个特征图的卷积默认框和我们的匹配策略。在对COCO上训练的模型进行微调时，我们的SSD512达到了80.0%的MAP，比Faster R-CNN高出4.1%。</p>
+
+<p><img src="https://ae05.alicdn.com/kf/Hf1b0685a54d64033968c1112e669ddear.png" alt="image-20220223213908405.png" title="image-20220223213908405.png" /></p>
+
+<p>表4：<strong>PASCAL VOC2012 test 检测结果</strong> Fast 和 Faster R-CNN使用最小尺寸为600的图像，而YOLO的图像大小为448×448。数据data: ”07++12”:  VOC2007 trainval 和 test 和 VOC2012 trainval的几何.”07++12+COCO”:首先在 COCO trainval35k 上训练再在 07++12上微调。</p>
+
+<h3 id="34-coco">3.4 COCO</h3>
+
+<p>为了进一步验证SSD框架，我们在COCO数据集上使用的SSD300和SSD512架构进行了训练。由于COCO中的对象往往比PASCALVOC小，所以我们对所有层都使用较小的默认框。我们按照Sec.2.2提到的策略,但是现在我们最小的默认框的比例是0.15，而不是0.2，而Conv4 _3上的默认框的比例是0.07(例如，对于300×300的图像，21像素)^5^。</p>
+
+<p>我们使用 traval35k [24] 进行训练。首先我们以$10^{−3}$的学习率训练模型160k迭代，然后以$10^{−4}$和40k迭代$10^{−5}$继续训练40k迭代。表5显示了在 test-dev2015 上的结果。与我们在 Pascal VOC 数据集上观察到的结果相似，SSD300 在MAP@0.5和MAP@[0.5：0.9]方面都优于FAST R-CNN。SSD300与ION[24]和Faster R-CNN[25]由一致的mAP@0.75 ，但mAP@0.5更差。通过将图像大小增加到512×512，我们的SSD512在这两个标准上都优于更快的R-CNN[25]，有趣的是，我们观察到SSD512的mAP@0.75中提高了5.3%，而在mAP@0.5中仅提高了1.2%。与ION相比，大小物体在AR上的改善更相似(5.4%比3.9%)。我们推测，Faster R-CNN在较小对象比SDD上更具竞争力，因为它在RPN部分和Faster R-CNN部分都执行了两个框精化步骤。在图5中，我们给出了一些使用SSD512模型在COCO test-dev上的检测实例。</p>
+
+<p><img src="https://ae01.alicdn.com/kf/Hf342db3c18504ad186e7a2248605b6980.png" alt="image-20220223213931194.png" title="image-20220223213931194.png" /></p>
+
+<p>表5: <strong>COCO test-dev2015 检测结果</strong></p>
+
+<h3 id="35-ilsvrc初步结果">3.5 ILSVRC初步结果</h3>
+
+<p>我们将用于COCO的相同网络体系结构应用到ILSVRC DETDataSet[16]。我们使用[22]中使用的ILSVRC2014 DET训练和val1训练SSD300模型。我们首先用$10^{−3}$的学习率训练模型320k次，然后用$10^{−4}$和40k次继续训练80k次和$10^{−5}$，我们可以在val2集[22]上达到43.4mAP。再次验证了SSD是高质量实时检测的通用框架。</p>
+
+<h3 id="36-小目标精度的数据扩增">3.6 小目标精度的数据扩增</h3>
+
+<p>如果没有像在Faster R-CNN中那样的后续特征重采样步骤，小对象的分类任务对于SSD来说相对困难，正如我们的分析(见图4)所示。在Sec.2.2中描述的数据扩增策略有助于提高性能，特别是在PASCAL VOC这样的小数据集上。该策略生成的随机裁剪可以看作是一种“扩增”操作，可以生成大得多的训练样本。为了实现创建更小训练样本的“缩减”操作，在进行任何随机裁剪操作之前，我们首先将一幅图像随机放置在原始图像大小的16倍的画布上，然后再进行任何随机裁剪操作，因为通过引入这种新的“扩展”数据增强技巧，我们可以获得更多的训练图像，所以我们必须将训练迭代次数增加一倍。如表6所示，我们已经看到多个数据集的mAP都增加了2%-3%。具体地说，图6显示新的增强技巧显著提高了小对象的性能。这一结果强调了数据扩充策略对最终模型精度的重要性。</p>
+
+<p>改进SSD的另一种方法是设计更好的默认框铺设策略，以便其位置和比例与特征图上每个位置的接受场更好地对齐。我们把这个留到以后的工作中去做。</p>
+
+<p><img src="https://ae04.alicdn.com/kf/H50273a2647054cf58d2829c8dae01835F.png" alt="image-20220223214018963.png" title="image-20220223214018963.png" /></p>
+
+<p>图5：<strong>SSD512 模型在 COCO TEST-DEV上的检测实例</strong> 我们展示了得分高于0.6的检测结果。每种颜色对应一个对象类别。</p>
+
+<p><img src="https://ae02.alicdn.com/kf/Hc57fac2e173143caba3ff6a2a52669d4n.png" alt="image-20220223214050739.png" title="image-20220223214050739.png" /></p>
+
+<p>表6：<strong>当我们添加图像扩展数据增强技巧时，在多个数据集上的结果</strong>SSD300*和SSD512*是使用新数据扩增进行训练的模型。</p>
+
+<p><img src="https://ae04.alicdn.com/kf/Hf7811f6ded0e4b348f9247c12e7f63bbF.png" alt="image-20220223214846699.png" title="image-20220223214846699.png" /></p>
+
+<p>图6：<strong>使用[21]对VOC2007测试集进行新数据扩充时对象大小的敏感度和影响</strong> 第一行显示了原始SSD300和SSD512模型每个类别的BBox区域的效果，下面一行对应于用新的数据扩增策略下训练的SSD300<em>和SSD512</em>模型。很明显，新的数据增强技巧对检测小目标有很大的帮助。</p>
+
+<h3 id="37-推理时间">3.7 推理时间</h3>
+
+<p>考虑到我们的方法产生了大量的框，在推理过程中有效地进行非最大抑制(NMS)是很有必要的。如果使用0.01%的置信门槛，我们可以过滤开出大多数框。然后，我们应用 nms，其每个类的jaccard overlap为0.45，并保留每个图像的前200个检测结果。此步骤对于SSD300和20 VOC类，每幅图像的成本约为1.7毫秒，接近所有新添加的层所花费的总时间(2.4毫秒)。我们测量了在使用 Titan X 和采用Intel Xeon E5-2667v3@3.20 GHz的cuDNN v4时批处理大小为8的速度。</p>
+
+<p><img src="https://ae05.alicdn.com/kf/H3811749f2b89417ba69b490f20728d2dH.png" alt="image-20220223214930762.png" title="image-20220223214930762.png" /></p>
+
+<p>表7展示了了SSD、Faster R-CNN[2]和 YOLO[5]之间的比较。SSD300 和 SSD512 两种方法在速度和精度上都优于Faster R-CmNN。虽然Fast YOLO[5]可以在155FPS下运行，但它的精度低了近22%mAP。据我们所知，SSD300 是第一个实现70%以上mAP的实时方法。需要蓄意的时，大约80%的转发时间花费在基本网络上(在我们的示例中为VGG16)。因此，使用更快的基础网络甚至可以进一步提高速度，这也可能使 SSD512 模型也具有实时性。</p>
+
+<h2 id="4-相关工作">4 相关工作</h2>
+
+<p>目前已建立的图像目标检测方法有两类，一类是基于滑动窗口的方法，另一类是基于似物性采样的方法。在卷积神经网络出现之前，这两种方法(可变形区域模型(DPM)[26]和选择性搜索[1])的技术水平具有相当的性能。然而，在R-CNN[22]将选择性搜索似物性采样和基于卷积网络的后分类相结合之后，似物性采样目标检测方法开始流行起来。</p>
+
+<p>原始的R-CNN方法已经在各种方面进行了改进。第一组方法提高了后分类的质量和速度，因为它需要对数以千计的图像作物进行分类，这是昂贵和耗时的，SPPnet[9] 显著提高了原始R-CNN方法的速度。它引入了一个对区域大小和尺度更稳健的空间金字塔汇合层，并允许分类层重用在多个图像分辨率生成的特征图上计算的特征。FAST R-CNN[6]扩展了SPPnet，通过最小化置信度和边界框的回归损失，它可以端到端地微调所有层，这是在MultiBox[7]中首次引入的，用于学习客观性。</p>
+
+<p>第二组方法使用深度神经网络提高提案生成的质量。在最近的大部分工作中，如MultiBox[7，8]，基于低级图像特征的选择性搜索区域方案被一个单独的深层神经网络直接生成的正确值所取代。这进一步提高了检测精度，但导致了需要训练两个之间具有依赖性的神经网络时设置的一些复杂。</p>
+
+<p>Faster R-CNN[2]用从似物性采样网络(RPN)学习的搜索建议来代替选择性搜索建议，并介绍了一种通过在这两个网络的微调共享卷积层和预测层之间交替来将RPN与Fast R-CNN相结合的方法。这种方式的似物性采样被用来汇集中层特征，并且最终分类步骤的成本较低。我们的SSD与Faster R-CNN中的似物性采样网络(RPN)非常相似，因为我们也使用一组固定的(默认)框进行预测，类似于RPN中的锚框。但是，我们不是使用这些来汇集特征并评估另一个分类器，而是同时为每个框中的每个对象类别生成一个分数。因此，我们的方法避免了将RPN和Fast R-CNN合并的复杂性，并且更容易训练，速度更快，并且可以直接集成到其他任务中。</p>
+
+<p>另一组与我们的方法直接相关的模型完全跳过了建议步骤，直接预测多个类别的边界框和置信度。OverFeat[4] 是滑动窗口方法的深度版本，它在知道底层对象类别的配置之后，直接从最上面的特征图的每个位置预测边界框。</p>
+
+<p>YOLO[5]使用整个最上层的特征图来预测多个类别和边界框(这些类别共享的边界框)的可信度。我们的SSD方法属于这一类，因为我们没有建议步骤，而是使用默认框。然而，我们的方法比现有的方法更具灵活性，因为我们可以在来自不同比例的多个特征图的每个特征位置上使用不同纵横比的默认框。如果我们从最上面的特征图中只对每个位置使用一个默认框，我们的SSD将具有与OverFeat相似的架构[4]；如果我们使用整个最上面的特征图并添加完全连通的层来进行预测，而不是我们的卷积预测器，并且不显式地考虑多个纵横比，我们可以近似地再现YOLO[5]。</p>
+
+<h2 id="结论">结论</h2>
+
+<p>本文介绍了一种单阶段多分类的快速目标检测器SSD。我们模型的一个主要特点是使用多尺度卷积锚框输出，附加到网络顶部的多个特征图上。该表示允许我们有效地对可能的框形状的空间进行建模。我们通过实验验证，在给定适当的训练策略的情况下，精心选择的默认边界框数量越多，性能就越好。我们建立的SSD模型比现有的方法至少多了一个数量级的框预测采样位置、比例和纵横比[5，7]。我们证明了在相同的VGG-16基础架构下，SSD在精确度和速度方面都优于其最先进的目标检测器。我们的SSD512模型在PASCAL VOC和COCO的精确度方面明显优于最先进的Faster R-CNN[2]，同时速度快3倍。我们的实时SSD300模型以59FPS的速度运行，比当前的实时YOLO[5]替代方案更快，同时达到了明显更高的检测精度。</p>
+
+<p>除了它的单独应用，我们相信我们整体和相对简单的SSD模型为需要目标组件的大型系统提供了一个有用的建筑基石。如何将其作为系统的一部分的使用递归神经网络来同时检测和跟踪视频中的对象，是一条有价值的探索方向。</p>
+
+<h2 id="致谢">致谢</h2>
+
+<p>这项工作是作为谷歌的实习项目开始的，并在北卡罗来纳大学继续进行。我们要感谢Alex Toshev与我们进行了有益的讨论，并感谢Google的Image Underming和DistBelef团队。我们也感谢Philip Ammirato和 Patrick Poirson的有益评论。我们感谢NVIDIA提供图形处理器，并感谢美国国家科学基金会1452851、1446631、1526367、1533771的支持。</p>
+
+<h2 id="参考文献">参考文献</h2>
+
+<ol>
+  <li>Uijlings, J.R., van de Sande, K.E., Gevers, T., Smeulders, A.W.: Selective search for objectrecognition. IJCV (2013)</li>
+  <li>Ren, S., He, K., Girshick, R., Sun, J.: Faster R-CNN: Towards real-time object detectionwith region proposal networks. In: NIPS. (2015)</li>
+  <li>He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image recognition. In: CVPR.(2016)</li>
+  <li>Sermanet, P., Eigen, D., Zhang, X., Mathieu, M., Fergus, R., LeCun, Y.: Overfeat: Integratedrecognition, localization and detection using convolutional networks. In: ICLR. (2014)</li>
+  <li>Redmon, J., Divvala, S., Girshick, R., Farhadi, A.: You only look once: Unified, real-timeobject detection. In: CVPR. (2016)</li>
+  <li>Girshick, R.: Fast R-CNN. In: ICCV. (2015)</li>
+  <li>Erhan, D., Szegedy, C., Toshev, A., Anguelov, D.: Scalable object detection using deepneural networks. In: CVPR. (2014)</li>
+  <li>Szegedy, C., Reed, S., Erhan, D., Anguelov, D.: Scalable, high-quality object detection.arXiv preprint arXiv:1412.1441 v3 (2015)</li>
+  <li>He, K., Zhang, X., Ren, S., Sun, J.: Spatial pyramid pooling in deep convolutional networksfor visual recognition. In: ECCV. (2014)</li>
+  <li>Long, J., Shelhamer, E., Darrell, T.: Fully convolutional networks for semantic segmentation.In: CVPR. (2015)</li>
+  <li>Hariharan, B., Arbel ́aez, P., Girshick, R., Malik, J.: Hypercolumns for object segmentationand fine-grained localization. In: CVPR. (2015)</li>
+  <li>Liu, W., Rabinovich, A., Berg, A.C.: ParseNet: Looking wider to see better. In: ILCR. (2016)</li>
+  <li>Zhou, B., Khosla, A., Lapedriza, A., Oliva, A., Torralba, A.: Object detectors emerge in deepscene cnns. In: ICLR. (2015)</li>
+  <li>Howard, A.G.: Some improvements on deep convolutional neural network based imageclassification. arXiv preprint arXiv:1312.5402 (2013)</li>
+  <li>Simonyan, K., Zisserman, A.: Very deep convolutional networks for large-scale image recog-nition. In: NIPS. (2015)</li>
+  <li>Russakovsky, O., Deng, J., Su, H., Krause, J., Satheesh, S., Ma, S., Huang, Z., Karpathy, A.,Khosla, A., Bernstein, M., Berg, A.C., Fei-Fei, L.: Imagenet large scale visual recognitionchallenge. IJCV (2015)</li>
+  <li>Chen, L.C., Papandreou, G., Kokkinos, I., Murphy, K., Yuille, A.L.: Semantic image seg-mentation with deep convolutional nets and fully connected crfs. In: ICLR. (2015)</li>
+  <li>Holschneider, M., Kronland-Martinet, R., Morlet, J., Tchamitchian, P.: A real-time algorithmfor signal analysis with the help of the wavelet transform. In: Wavelets. Springer (1990)286–297</li>
+  <li>Jia, Y., Shelhamer, E., Donahue, J., Karayev, S., Long, J., Girshick, R., Guadarrama, S.,Darrell, T.: Caffe: Convolutional architecture for fast feature embedding. In: MM. (2014)</li>
+  <li>Glorot, X., Bengio, Y.: Understanding the difficulty of training deep feedforward neuralnetworks. In: AISTATS. (2010)</li>
+  <li>Hoiem, D., Chodpathumwan, Y., Dai, Q.: Diagnosing error in object detectors. In: ECCV2012. (2012)</li>
+  <li>Girshick, R., Donahue, J., Darrell, T., Malik, J.: Rich feature hierarchies for accurate objectdetection and semantic segmentation. In: CVPR. (2014)</li>
+  <li>Zhang, L., Lin, L., Liang, X., He, K.: Is faster r-cnn doing well for pedestrian detection. In:ECCV. (2016)</li>
+  <li>Bell, S., Zitnick, C.L., Bala, K., Girshick, R.: Inside-outside net: Detecting objects in contextwith skip pooling and recurrent neural networks. In: CVPR. (2016)</li>
+  <li>COCO: Common Objects in Context. http://mscoco.org/dataset/#detections-leaderboard (2016) [Online; accessed 25-July-2016].</li>
+  <li>Felzenszwalb, P., McAllester, D., Ramanan, D.: A discriminatively trained, multiscale, de-formable part model. In: CVPR. (2008)</li>
+</ol>
+
+:ET
