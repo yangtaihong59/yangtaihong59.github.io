@@ -2,7 +2,7 @@
 layout: post
 title:  SSD：单发多分类检测算法
 date:   2022-02-23 15:26:32 +0800
-subtitle: Each post also has a subtitle
+subtitle: 文献翻译 SSD：Single Shot MultiBox Detector
 categories: markdown
 tags: [计算机视觉,深度学习,目标检测,文献翻译]
 ---
@@ -61,9 +61,8 @@ SSD方法基于前馈卷积网络，该网络产生固定大小的边界框集�
 **检测训练：**SSD的训练是由MultiBox派生出来的，但它已经发展到能够处理多种类物体。设定$x_{ij}^{p}=\{1,0\}$表示第$i$个默认框和第$j$个真实框对于种类$p$是否匹配。根据以上的匹配策略我们可以得到 $\sum_ix_{ij}^p\ge1$ 。总的损失函数是位置损失函数（loc）和置信损失函数（conf）权重之和：
 $$
 L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha L_{loc}(x,l,g)) \tag1
-$$
 其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。
-
+$$
 <img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" />
 
 置信损失函数是多个种类的softmax损失函数$(c)$。
@@ -71,6 +70,11 @@ $$
 L_{conf}(x,c)=-\sum^{N}_{i\in Pos}x^p_{ij}log(\hat{c}^p_i)-\sum_{i\in Neg}log(\hat{c}^0_i)\quad \textsf{where} \quad \hat{c}^p_i=\frac{\textsf{exp}(c^p_i)}{\sum_p\textsf{exp}(x^p_i)}\tag3
 $$
 
+其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。<img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" />
+
+置信损失函数是多个种类的softmax损失函数$(c)$。
+
+<img src="https://ae02.alicdn.com/kf/Hae10dd893a8240a09b04a3a5f81fe395U.png" alt="Hcd5c79cafdce4fb7969d241951815152u.png" title="Hcd5c79cafdce4fb7969d241951815152u.png" />
 
 
 并且通过交叉验证将权重项α设置为1。
