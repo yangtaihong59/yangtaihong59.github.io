@@ -2,7 +2,6 @@
 layout: post
 title:  计算机视觉的理论框架
 date:   2022-01-11 15:26:32 +0800
-subtitle: Each post also has a subtitle
 categories: markdown
 tags: [计算机视觉]
 ---
