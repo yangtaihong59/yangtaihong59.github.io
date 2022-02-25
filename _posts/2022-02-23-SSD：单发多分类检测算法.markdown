@@ -71,12 +71,6 @@ $$
 L_{conf}(x,c)=-\sum^{N}_{i\in Pos}x^p_{ij}log(\hat{c}^p_i)-\sum_{i\in Neg}log(\hat{c}^0_i)\quad \textsf{where} \quad \hat{c}^p_i=\frac{\textsf{exp}(c^p_i)}{\sum_p\textsf{exp}(x^p_i)}\tag3
 $$
 
-其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。<img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" />
-
-置信损失函数是多个种类的softmax损失函数$(c)$。
-
-<img src="https://ae02.alicdn.com/kf/Hae10dd893a8240a09b04a3a5f81fe395U.png" alt="Hcd5c79cafdce4fb7969d241951815152u.png" title="Hcd5c79cafdce4fb7969d241951815152u.png" />
-
 
 并且通过交叉验证将权重项α设置为1。
 
