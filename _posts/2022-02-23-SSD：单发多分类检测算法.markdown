@@ -64,12 +64,11 @@ L(x,c,l,g)=\frac{1}{N}(L_{conf}(x,c)+\alpha L_{loc}(x,l,g)) \tag1
 $$
 其中N是匹配默认框的数量。如果$N=0$，设置损失函数为0。位置损失函数是预测框$(l)$与真实框$(g)$之间的Smooth L1损失。类似与Faster R-CNN，我们通过回归方式得到中心$(cx,cy)$与默认框$(d)$宽$(w)$与高$(h)$的补偿。
 
-<img src="https://ae04.alicdn.com/kf/H846299cfdb6e4334821d843a456c9232b.png" alt="image-20220223213300639.png" title="image-20220223213300639.png" />
+![image-20220223213300639.png](img/2022-02-23-SSD：单发多分类检测算法/He2588c5e912e4a2c8cee5a7b5aad503cw.jpeg)
 
 置信损失函数是多个种类的softmax损失函数$(c)$。
-$$
-L_{conf}(x,c)=-\sum^{N}_{i\in Pos}x^p_{ij}log(\hat{c}^p_i)-\sum_{i\in Neg}log(\hat{c}^0_i)\quad \textsf{where} \quad \hat{c}^p_i=\frac{\textsf{exp}(c^p_i)}{\sum_p\textsf{exp}(x^p_i)}\tag3
-$$
+
+![image-20220223213343962.png](img/2022-02-23-SSD：单发多分类检测算法/Hefb96bea0d1d432180e65429a4c8c110Q.jpeg)
 
 
 并且通过交叉验证将权重项α设置为1。
