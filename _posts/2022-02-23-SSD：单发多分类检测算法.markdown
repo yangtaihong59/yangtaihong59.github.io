@@ -2,7 +2,7 @@
 layout: post
 title:  SSD：单发多分类检测算法
 date:   2022-02-23 15:26:32 +0800
-subtitle: 文献翻译 SSD Single Shot MultiBox Detector
+subtitle: Each post also has a subtitle
 categories: markdown
 tags: [计算机视觉,深度学习,目标检测,文献翻译]
 ---
