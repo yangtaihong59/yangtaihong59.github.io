@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>计算机视觉的理论框架 | YTH的小破站</title>
+<meta name="generator" content="Jekyll v4.2.1">
+<meta property="og:title" content="计算机视觉的理论框架">
+<meta name="author" content="yangtaihong59">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="计算机视觉的理论框架">
+<meta property="og:description" content="计算机视觉的理论框架">
+<link rel="canonical" href="/jekyll-theme-yat/markdown/2022/01/11/%E5%BC%95%E8%AE%BA.html">
+<meta property="og:url" content="/jekyll-theme-yat/markdown/2022/01/11/%E5%BC%95%E8%AE%BA.html">
+<meta property="og:site_name" content="YTH的小破站">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2022-01-11T07:26:32+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="计算机视觉的理论框架">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"yangtaihong59"},"dateModified":"2022-01-11T07:26:32+00:00","datePublished":"2022-01-11T07:26:32+00:00","description":"计算机视觉的理论框架","headline":"计算机视觉的理论框架","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/markdown/2022/01/11/%E5%BC%95%E8%AE%BA.html"},"url":"/jekyll-theme-yat/markdown/2022/01/11/%E5%BC%95%E8%AE%BA.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="shortcut icon" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="YTH的小破站">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header " role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="YTH的小破站" src="" onerror="this.style.display='none'">
+  YTH的小破站
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<span class="page-link">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<span class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</span>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</span>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+     <div class="post">
+  <section>
+
+
+
+
+
+
+
+
+
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">计算机视觉的理论框架</h1>
+  <h2 class="post-subtitle">Each post also has a subtitle</h2>
+
+  <p class="post-meta">
+    <time class="dt-published" datetime="2022-01-11T07:26:32+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Jan 11, 2022
+    </time>
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 6 mins</span>
+  </p>
+<div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89">#计算机视觉</a></div></header>
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <h2 id="计算机视觉的理论框架">计算机视觉的理论框架</h2>
+
+<h3 id="一marr的视觉理论框架-基于重构的计算机视觉理论">（一）Marr的视觉理论框架 ——基于重构的计算机视觉理论</h3>
+
+<ol>
+  <li>
+    <p><strong>视觉是一个信息处理的过程，从三个不同的层次加以研究</strong></p>
+
+    <ul>
+      <li>信息处理的计算理论：对什么信息进行计算，为什么要进行这些计算</li>
+      <li>信息处理的表示或算法：如何进行所要求的计算，即设计特定的算法</li>
+      <li>实现机制或者硬件：实现某一特定算法的具体载体，如设备、装置等</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>计算机视觉完成上述信息处理过程的三个阶段</strong></p>
+
+    <ul>
+      <li>
+        <p><strong>第一阶段：初始简图，又称为基元</strong></p>
+
+        <ul>
+          <li>
+            <p>图像中亮度的变化和局部的几何特征，由两部分组成：
+==第一部分：== 边缘、线条、斑点、端点等 —— 原始基元，对亮度变化的描述；
+==第二部分：== 完全而明确地表示几何关系</p>
+
+            <blockquote>
+              <p>对原始基元进行选择、聚合和概括，形成尺度更大、更抽象的标记——轮廓和区域。</p>
+            </blockquote>
+          </li>
+          <li>
+            <p>初始简图是对二维图像特征的一种描述。</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p><strong>第二阶段：2.5维简图</strong></p>
+
+        <ul>
+          <li>
+            <p>将场景分解为物体之前，先建立场景中可见表面的描述，即为2.5维简图的概念</p>
+          </li>
+          <li>
+            <p>能够表示深度、局部表面方向、不连续点的信息、全局的深度描述</p>
+
+            <blockquote>
+              <p>在图像中用矢量线表示表面的倾斜程度和倾斜方向（该矢量是表面法线的投影）、表面方向的不连续边界用虚线表示、遮挡造成的边界用实线表示、各点的深度用某标量表示。</p>
+            </blockquote>
+          </li>
+          <li>
+            <p>这种表示是在以观察者为中心的坐标系中关于场景的三维特性描述</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p><strong>第三阶段：三维模型，又称全三维图</strong></p>
+
+        <ul>
+          <li>建立适于视觉识别和理解的场景的三维形状描述</li>
+          <li>这里以物体为中心建立坐标系，并包含尺度信息</li>
+          <li>物体坐标系的建立：通常利用物体固有的突出的几何性质，比如有对称轴的物体。</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="二基于推理的视觉识别理论框架">（二）基于推理的视觉识别理论框架</h3>
+
+<ol>
+  <li>
+    <p><strong>视觉问题从本质上说是不适定的（ill-posed）</strong></p>
+
+    <ul>
+      <li>大多数视觉任务是一个逆向问题，由二维图像不能唯一确定三维场景。因为相同的图像可由不同的场景产生。</li>
+      <li>看到这些图像时，大多并不会产生多义性。表明人类视觉在理解图像时，利用了附加的高层信息即先验知识，或者利用了某些可以去除多义性解释的通用约束。</li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>感知群能力</strong></p>
+
+    <ul>
+      <li>
+        <p>人类视觉系统具有：不知道图像内容的任何先验知识，可以从图像获得相对的聚类和结构的能力。比如说：对称性、平行性、连通性、重复纹理、共线性等。</p>
+      </li>
+      <li>
+        <p>主要强调视觉整体性和选择性。认为人的视觉中存在天然的对某种特定模式或概念的识别机制！好像已经有一种先验的模型存在那里进行描述！</p>
+      </li>
+      <li>
+        <p>在聚类和结构感知中起重要作用的因素：</p>
+
+        <blockquote>
+          <p>（1）接近性（proximity）：较为接近的元素倾向于聚集在一起；
+（2）相似性（similarity）：颜色、方向、大小等物理属性相似元素相聚集；
+（3）封闭性（closure）：曲线段在形成完成曲线时有形成封闭区域的倾向；
+（4）连续性（continuation）：位于同一直线或平滑曲线上的元素相聚集；
+（5）对称性（symmetry）：任何横向对称于某个轴的元素相聚集；
+（6）熟知性（familiarity）：经常看到在一起出现的元素相聚集。</p>
+        </blockquote>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>感知群能力的基本原理</strong></p>
+
+    <ul>
+      <li>
+        <p>要解决的问题是：聚类过程的目的是什么？如何实现聚类过程？</p>
+
+        <ul>
+          <li>
+            <p>目的：发现图像元素之间的因果关系，或非偶然性关系。</p>
+
+            <blockquote>
+              <p>图像之间的关系不太可能是由于偶然因素产生的程度，决定了元素之间关系的显要性。如，图像中等间距共线三点，可以推测他们是空间中等间距共线三点的像。</p>
+            </blockquote>
+          </li>
+          <li>
+            <p>实现：与大多数逆问题一样，原始状态下的聚类是一个不适定的问题。</p>
+
+            <blockquote>
+              <p>引入目标函数来限制界的空间。按正则化理论，聚类是一个求能量极小的问题。</p>
+            </blockquote>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>视觉识别与推理</strong></p>
+
+    <ul>
+      <li>先验知识：发现图像中的特征与环境中物体的先验表示之间的匹配对应，不需要完全重构环境物理参数，在识别过程中关于环境的先验知识会起到积极的作用。
+日常生活中所见的数量和种类繁多的物体与景物，先验知识的约束作用使得有些视觉问题可以有充分的约束而得到解决。</li>
+      <li>识别推理：识别超越了图像中的数据，能够根据小部分预期的匹配对应而实现可靠的识别，之后应用知识来推论视觉图像没有直接提供的场景的特性。表明视觉理解可以通过推理来完成。</li>
+    </ul>
+  </li>
+</ol>
+
+
+    </div>
+
+</article>
+<div class="post-nav">
+<a class="previous" href="/jekyll-theme-yat/jekyll/2018/12/07/welcome-to-jekyll.html" title="Welcome to Jekyll!">Welcome to Jekyll!</a><a class="next" href="/jekyll-theme-yat/markdown/2022/02/23/SSD-%E5%8D%95%E5%8F%91%E5%A4%9A%E5%88%86%E7%B1%BB%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95.html" title="SSD：单发多分类检测算法">SSD：单发多分类检测算法</a>
+</div>
+<div class="post-related">
+      <div>Related Articles</div>
+      <ul>
+        <li><a class="post-link" href="/jekyll-theme-yat/markdown/2022/02/23/SSD-%E5%8D%95%E5%8F%91%E5%A4%9A%E5%88%86%E7%B1%BB%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95.html" title="SSD：单发多分类检测算法">SSD：单发多分类检测算法</a></li>
+<li><a class="post-link" href="/jekyll-theme-yat/markdown/2018/12/05/an-exhibit-of-markdown.html" title="SSD：单发多分类检测算法">An exhibit of Markdown</a></li>
+<li><a class="post-link" href="/jekyll-theme-yat/markdown/2015/02/28/test-markdown.html" title="SSD：单发多分类检测算法">Test markdown</a></li>
+<li><a class="post-link" href="/jekyll-theme-yat/junk/2016/08/12/my-example-post.html" title="SSD：单发多分类检测算法">My Example Post</a></li>
+</ul>
+    </div>
+<div class="post-comments"></div></section>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+    <!-- Get sidebar items --><style type="text/css" media="screen">
+.post-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+</style>
+
+<div class="post-menu">
+  <div class="post-menu-title">TOC</div>
+  <div class="post-menu-content"></div>
+</div>
+
+<script>
+  function generateContent() {
+    var menu = document.querySelector(".post-menu");
+    var menuContent =  menu.querySelector(".post-menu-content");
+    var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+    // Hide menu when no headings
+    if (headings.length === 0) {
+      return menu.style.display = "none";
+    }
+
+    // Generate post menu
+    var menuHTML = '';
+    for (var i = 0; i < headings.length; i++) {
+      var h = headings[i];
+      menuHTML += (
+        '<li class="h-' + h.tagName.toLowerCase() + '">'
+        + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+    }
+
+    menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+    // The header element
+    var header = document.querySelector('header.site-header');
+
+    function doMenuCollapse(index, over_items) {
+      var items = menuContent.firstChild.children;
+
+      if (over_items == undefined) {
+        over_items = 20;
+      }
+
+      if (items.length < over_items) {
+        return;
+      }
+
+      var activeItem = items[index];
+      var beginItem = activeItem
+      var endItem = activeItem
+      var beginIndex = index;
+      var endIndex = index + 1;
+      while (beginIndex >= 0
+        && !items[beginIndex].classList.contains('h-h2')) {
+        beginIndex -= 1;
+      }
+      while (endIndex < items.length
+        && !items[endIndex].classList.contains('h-h2')) {
+        endIndex += 1;
+      }
+      for (var i = 0; i < beginIndex; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+      for (var i = beginIndex + 1; i < endIndex; i++) {
+        item = items[i]
+        // if (!item.classList.contains('h-h2')) {
+          item.style.display = '';
+        // }
+      }
+      for (var i = endIndex; i < items.length; i++) {
+        item = items[i]
+        if (!item.classList.contains('h-h2')) {
+          item.style.display = 'none';
+        }
+      }
+    }
+
+    // Init menu collapsed
+    doMenuCollapse(-1);
+
+    // Active the menu item
+    window.addEventListener('scroll', function (event) {
+      var lastActive = menuContent.querySelector('.active');
+      var changed = true;
+      var activeIndex = -1;
+      for (var i = headings.length - 1; i >= 0; i--) {
+        var h = headings[i];
+        var headingRect = h.getBoundingClientRect();
+        var headerRect = header.getBoundingClientRect();
+        var headerTop = Math.floor(headerRect.top);
+        var headerHeight = Math.floor(headerRect.height);
+        var headerHeight = headerTop + headerHeight + 20;
+        if (headingRect.top <= headerHeight) {
+          var id = 'h-' + h.getAttribute('id');
+          var a = menuContent.querySelector('a[href="#' + id  + '"]');
+          var curActive = a.parentNode;
+          if (curActive) {
+            curActive.classList.add('active');
+            activeIndex = i;
+          }
+          if (lastActive == curActive) {
+            changed = false;
+          }
+          break;
+        }
+      }
+      if (changed) {
+        if (lastActive) {
+          lastActive.classList.remove('active');
+        }
+        doMenuCollapse(activeIndex);
+      }
+      event.preventDefault();
+    });
+  }
+  generateContent();
+</script>
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner">
+<div>Unpublished Work <span class="copyleft">©</span> 2022-2022 yangtaihong59</div>
+      <div>Powered by <a title="Jekyll is a simple, blog-aware, static site
+      generator." href="https://jekyllrb.com/">Jekyll</a> &amp; <a title="Yat, yet
+      another theme." href="https://github.com/jeffreytse/jekyll-theme-yat">Yat Theme</a>.</div>
+      <div class="footer-col rss-subscribe">Subscribe <a href="/jekyll-theme-yat/feed.xml">via RSS</a>
+</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
