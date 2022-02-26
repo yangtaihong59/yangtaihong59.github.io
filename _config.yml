@@ -1,1 +1,98 @@
-theme: jekyll-theme-cayman
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that. If you find
+# yourself editing this file very often, consider using Jekyll's data files
+# feature for the data you need to update frequently.
+#
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+# These are used to personalize your new site. If you look in the HTML files,
+# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
+# You can create any custom variable you would like, and they will be accessible
+# in the templates via {{ site.myvariable }}.
+title: YTH的小破站
+email: taihongyang59@gmail.com
+author: yangtaihong59
+copyright: "Unpublished Work (cleft) 2022-{currentYear} {author}"
+
+description: >- # this means to ignore newlines until "baseurl:"
+  This is a very personal blog. I don't write blogs for anyone, but
+  just record what I do or what I think. So there are many things
+  wrong and you may have different thoughts. It would be nice if I
+  share knowledge and thoughts rather than criticism. It will be
+  great help if you give and teach your knowledge and thoughts to me.
+
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "" # the base hostname & protocol for your site, e.g. http://example.com
+favicon: "" # the favicon for your site
+
+# Yat date format
+# refer to https://shopify.github.io/liquid/filters/date/ if you want to customize this
+yat:
+  date_format: "%d %b %Y"
+
+# If you want more debug log, you can set true
+# debug: true
+
+# If you want transparent header, you can set true
+# header_transparent: false
+
+# Google analytics
+#google_analytics: "UA-96513476-2"
+#enableDNT: "false"
+
+# If you want to generate website sitemap, you can set true
+sitemap: true
+
+# If you want to change site language, you can set lang option
+# lang: "en"  # default lang is en
+
+# You can choose a theme color
+# Default theme colors as below:
+# coolblack: #090a0b
+# spacegrey: #353535
+# snowwhite: #ffffff
+#
+theme_color: snowwhite
+#
+# Custom color as below:
+# theme_color: "#882250"
+
+# If you want to link only specific pages in your header, uncomment
+# this and add the path to the pages in order as they should show up
+header_pages:
+  - index.html
+  - archives.html
+  - categories.html
+  - tags.html
+  - about.md
+
+# Pagination setting
+paginate: 10
+
+# Disqus comments
+disqus:
+  shortname: "jeffreytse"
+
+# Gitment comments
+# gitment:
+#   username: ""
+#   repo: ""
+#   client_id: ""
+#   client_secret: ""
+#   redirect_uri: ""
+
+# Build settings
+markdown: kramdown
+remote_theme: jeffreytse/jekyll-theme-yat
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-paginate
+  - jekyll-spaceship
+  - jekyll-remote-theme
