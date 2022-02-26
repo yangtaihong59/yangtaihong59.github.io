@@ -24,9 +24,9 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: YTH的小破站
-email: taihongyang59@gmail.com
-author: yangtaihong59
+title: Your awesome title
+email: your-email@domain.com
+author: GitHub User
 
 # Copyright setting
 # You can use any html code, currently below placeholders are available:
@@ -40,7 +40,7 @@ author: yangtaihong59
 #   "Copyright (c) 2017-{currentYear} <a href="https://example.com">{author}</a>"
 #   "Copyright © 2017-2021 Foobar"
 #
-copyright: "Unpublished Work (cleft) 2022-{currentYear} {author}"
+copyright: "Unpublished Work (cleft) 2017-{currentYear} {author}"
 
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this
@@ -60,7 +60,7 @@ yat:
 # debug: false
 
 # If you don't want transparent header, you can set false
-# header_transparent: false
+# header_transparent: true
 
 # If you want to change the content width, you can set to another value
 # content_width: "920px"
@@ -72,7 +72,7 @@ yat:
 # sitemap: false
 
 # If you want to change site language, you can set lang option
-lang: "zh-CN"  # default lang is en
+# lang: "en"  # default lang is en
 
 # Translate languges
 # langs refer to https://cloud.google.com/translate/docs/languages
