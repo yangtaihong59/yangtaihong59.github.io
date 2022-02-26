@@ -197,8 +197,7 @@ lang: "zh-CN"  # default lang is en
 # Build settings
 # highlighter: none
 markdown: kramdown
-kmarkdown:
-  input: GFM
+remote_theme: jeffreytse/jekyll-theme-yat
 
 plugins:
   - jekyll-feed
