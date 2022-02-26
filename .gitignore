@@ -1,9 +1,5 @@
-_site
+*.gem
+.bundle
 .sass-cache
-.jekyll-cache
-.jekyll-metadata
-vendor
-<<<<<<< HEAD
-.jekyll-cache/Jekyll/Cache/Jekyll--Cache/b7/9606fb3afea5bd1609ed40b622142f1c98125abcfe89a76a661b0e8e343910
-=======
->>>>>>> parent of 86c4791 (新主题)
+_site
+Gemfile.lock
