@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  计算机视觉的理论框架
+title:  高内聚和低耦合
 date:   2022-02-27 
 categories: markdown
 tags: [零散知识]
