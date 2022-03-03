@@ -8,7 +8,7 @@ tags: [深度学习]
 ---
 ## 1、简介
 
-本文介绍了一种Colab 连接 Google 云盘 并使用VScode 调试程序的方法，该方法可以使用VScode的所有功能进行更加方便的调试工作。
+本文介绍了一种Colab 连接 Google 云盘 并使用 VScode 调试程序的方法，该方法可以使用VScode的所有功能进行更加方便的调试工作。
 
 ## 2、操作步骤
 
@@ -19,6 +19,8 @@ from google.colab import drive
 drive.mount('/content/drive/')
 ```
 
+此处会弹出与云盘连接的窗口，按照要求步骤执行即可
+
 ### 安装必要环境
 
 ```python
@@ -26,9 +28,11 @@ drive.mount('/content/drive/')
 from colabcode import ColabCode
 ```
 
+此处可能会出现一些报错，一般对使用没有影响无需关注，可以先做下去
+
 ### 关闭所有ngrok服务
 
-```
+```python
 !killall ngrok
 ```
 
@@ -56,4 +60,4 @@ ColabCode(port=10000, password='helloworld')
 
 ## 3、总结
 
-正常情况下按上述步骤完成设置后即可看到网页VScode打开了，在这个页面可以使用Vscode的文件管理系统和使用terminal。
+正常情况下按上述步骤完成设置后即可看到网页VScode打开了，在这个页面可以使用VScode的所有功能，可以说是相当方便了。
