@@ -2,7 +2,7 @@
 layout: post
 title:  计算机视觉的理论框架
 date:   2022-01-11 15:26:32 +0800
-categories: markdown
+categories: 知识总结
 tags: [计算机视觉]
 ---
 ## 计算机视觉的理论框架

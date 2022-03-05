@@ -2,7 +2,7 @@
 layout: post
 title:  高内聚和低耦合
 date:   2022-02-27 
-categories: markdown
+categories: 知识总结
 tags: [零散知识]
 ---
 # 高内聚与低耦合
