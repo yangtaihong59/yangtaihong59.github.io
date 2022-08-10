@@ -1,13 +1,11 @@
 ---
 layout: post
-title:  虚拟机ubuntu18安装Ros lego-loam
+title:  虚拟机ubuntu18安装 Ros lego-loam
 subtitle: 环境配置流程
 date:   2022-08-10
 categories: ROS
 tags: [ROS环境配置 SLAM]
 ---
-
-# 虚拟机ubuntu18安装Ros lego-loam
 
 ## 我的安装环境
 
@@ -22,11 +20,12 @@ ubuntu18.04
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 ```
-#### 问题 安装速度缓慢
-
-- **原因：** 软件源的问题
-- **解决方案：** 登录 http://wiki.ros.org/ROS/Installation/UbuntuMirrors网站
-- **有USTC，清华，北外，上海交大的源，任意一个复制替换即可**
+> #### 问题 安装速度缓慢
+>
+> - **原因：** 软件源的问题
+> - **解决方案：** 登录 http://wiki.ros.org/ROS/Installation/UbuntuMirrors网站
+> - **有USTC，清华，北外，上海交大的源，任意一个复制替换即可**
+>
 
 ### Set up your keys
 
@@ -60,61 +59,62 @@ rosdep update
 ```
  在执行`rosdep update` 会出现超时，主要的解决方法参考
 
-#### 问题 超时
-
-dckwin（解决rosdep update一直timeout的问题）
-
-本质是把要下载的文件全部下载到本地，然后修改相应的URL。
-
-- 把 https://github.com/ros/rosdistro 的配置文件下载到本地
-  - `git clone https://github.com/ros/rosdistro` 这里下载到/home/uestc/目录下。
-
-> **进入root**
+> #### 问题 超时
+>
+> dckwin（解决rosdep update一直timeout的问题）
+>
+> 本质是把要下载的文件全部下载到本地，然后修改相应的URL。
+>
+> - 把 https://github.com/ros/rosdistro 的配置文件下载到本地
+>   - `git clone https://github.com/ros/rosdistro` 这里下载到/home/uestc/目录下。
+>
+> > **进入root**
+> >
+> > ```
+> > sudo passwd root
+> > ```
+> >
+> > 再输入用户密码，接下来会让你设置root密码，并再次确认。
+> > 接下来输入`su`，再输入刚刚设置的root密码就可以进入root了。
+>
+> - 修改 `/etc/ros/rosdep/sources.list.d/20-default.list` 文件，
+>
+>   - 如果在第一步`sudo rosdep init` 没有生成`20-default.list`文件，那么可以自己手动在`/home/XXX`下：
+>     `touch 20-default.list`
+>     打开这个文件：写入以下内容，请注意，路径必须和第1步中你下载的rosdistro 里的文件路径对应
+>
+>   - 
+>     ```
+>     yaml file:///home/xxx/rosdistro/rosdep/osx-homebrew.yaml osx
+>      
+>     # generic
+>     yaml file:///home/xxx/rosdistro/rosdep/base.yaml
+>     yaml file:///home/xxx/rosdistro/rosdep/python.yaml
+>     yaml file:///home/xxx/rosdistro/rosdep/ruby.yaml
+>     gbpdistro file:///home/xxx/rosdistro/releases/fuerte.yaml fuerte
+>     ```
+>
+> - 修改`/usr/lib/python2.7/dist-packages/rosdep2/sources_list.py`， 在这个文件的75行
+>   `DEFAULT_SOURCES_LIST_URL = 'file:///home/xxx/rosdistro/rosdep/sources.list.d/20-default.list'`
+>
+> - 请注意，如果`20-default.list`是你自己生成的文件，那么就填你自己生成文件的路径; 如果你是改的`/etc/ros/rosdep/sources.list.d/20-default.list`文件，那么应该填写 `DEFAULT_SOURCES_LIST_URL = ‘file:///etc/ros/rosdep/sources.list.d/20-default.list’`
+>
+> - 修改 `/usr/lib/python2.7/dist-packages/rosdep2/rep3.py` 39行 把 URL 改成自己`targets.yaml`文件本地的文件路径
+>   `REP3_TARGETS_URL = 'file:///home/uestc/rosdistro/releases/targets.yaml'`
+>
+> - 修改 `/usr/lib/python2.7/dist-packages/rosdistro/__init__.py` 68 行 把 URL 改成自己`index-v4.yaml`文件本地的文件路径
+>   `DEFAULT_INDEX_URL = 'file:///home/uestc/rosdistro/index-v4.yaml'`
+>
+> 所有文件保存之后退出。然后重新打开一个终端
+>
 >
 > ```
-> sudo passwd root
+> sudo rosdep init
+> rosdep update
 > ```
 >
-> 再输入用户密码，接下来会让你设置root密码，并再次确认。
-> 接下来输入`su`，再输入刚刚设置的root密码就可以进入root了。
-
-- 修改 `/etc/ros/rosdep/sources.list.d/20-default.list` 文件，
-
-  - 如果在第一步`sudo rosdep init` 没有生成`20-default.list`文件，那么可以自己手动在`/home/XXX`下：
-    `touch 20-default.list`
-    打开这个文件：写入以下内容，请注意，路径必须和第1步中你下载的rosdistro 里的文件路径对应
-
-  - 
-    ```
-    yaml file:///home/xxx/rosdistro/rosdep/osx-homebrew.yaml osx
-     
-    # generic
-    yaml file:///home/xxx/rosdistro/rosdep/base.yaml
-    yaml file:///home/xxx/rosdistro/rosdep/python.yaml
-    yaml file:///home/xxx/rosdistro/rosdep/ruby.yaml
-    gbpdistro file:///home/xxx/rosdistro/releases/fuerte.yaml fuerte
-    ```
-
-- 修改`/usr/lib/python2.7/dist-packages/rosdep2/sources_list.py`， 在这个文件的75行
-  `DEFAULT_SOURCES_LIST_URL = 'file:///home/xxx/rosdistro/rosdep/sources.list.d/20-default.list'`
-
-- 请注意，如果`20-default.list`是你自己生成的文件，那么就填你自己生成文件的路径; 如果你是改的`/etc/ros/rosdep/sources.list.d/20-default.list`文件，那么应该填写 `DEFAULT_SOURCES_LIST_URL = ‘file:///etc/ros/rosdep/sources.list.d/20-default.list’`
-
-- 修改 `/usr/lib/python2.7/dist-packages/rosdep2/rep3.py` 39行 把 URL 改成自己`targets.yaml`文件本地的文件路径
-  `REP3_TARGETS_URL = 'file:///home/uestc/rosdistro/releases/targets.yaml'`
-
-- 修改 `/usr/lib/python2.7/dist-packages/rosdistro/__init__.py` 68 行 把 URL 改成自己`index-v4.yaml`文件本地的文件路径
-  `DEFAULT_INDEX_URL = 'file:///home/uestc/rosdistro/index-v4.yaml'`
-
-所有文件保存之后退出。然后重新打开一个终端
-
-
-```
-sudo rosdep init
-rosdep update
-```
-
-然后再执行`roscore`，这样我们的ros服务都启动成功了
+> 然后再执行`roscore`，这样我们的ros服务都启动成功了
+>
 
 ## lego-loam 安装教程
 ### 1.安装GTSAM
@@ -140,7 +140,7 @@ cd build
 cmake ..
 sudo make install
 ```
-### 3.编译lego-loam源码
+### 3.建立自己的ROS工作空间
 ```
 mkdir -p catkin_ws/src
 
@@ -148,7 +148,7 @@ cd catkin_ws/src
 
 catkin_init_workspace
 ```
-### 下载lego-loam
+### 4.下载lego-loam
 ```
 cd ~/catkin_wc_/src
 
@@ -158,55 +158,58 @@ git clone https://github.com/RobustFieldAutonomyLab/LeGO-LOAM.git
 如果觉得慢，可以用别人的gitee库
 git clone https://gitee.com/Yeah2333/LeGO-LOAM.git
 ```
-### 编译lego-loam
+### 5.编译lego-loam
 ```
 cd ..
 catkin_make -j1
 source ~/devel/setup.bash
 ```
-运行lego-loam
+### 6.运行lego-loam
+
 ```
 roslaunch lego_loam run.launch
 
 rosbag play *.bag --clock --topic /velodyne_points /imu/data
 ```
-#### 问题 虚拟机下运行rviz时报错闪退或者跑LEGO-LOAM却只有一条路径的现象
-
-- 关闭硬件加速	
-
-  - ```
-    echo " export SVGA_VGPU10=0" >> ~/.bashrc
-    source ~/.bashrc
-    ```
-
-
-- 关闭虚拟机的3D图形加速
-
 至此，lego-loam编译安装结束
 
-#### 问题 运行lego_loam时报错[mapOptmization-7] process has died [pid 11653, exit code 127, cmd /home/p/legoloam/dev
+> #### 问题 虚拟机下运行rviz时报错闪退或者跑LEGO-LOAM却只有一条路径的现象
+>
+> - 关闭硬件加速	
+>
+>   - ```
+>     echo " export SVGA_VGPU10=0" >> ~/.bashrc
+>     source ~/.bashrc
+>     ```
+>
+>
+> - 关闭虚拟机的3D图形加速
+>
 
-方法一、直接安装`libparmetis-dev`即可解决
+> #### 问题 运行lego_loam时报错[mapOptmization-7] process has died [pid 11653, exit code 127, cmd /home/p/legoloam/dev
+>
+> 方法一、直接安装`libparmetis-dev`即可解决
+>
+> ```
+> sudo apt-get install libparmetis-dev
+> ```
+>
+> 方法二、网上也有说因为没有把动态链接库的安装路径（例如 `/usr/local/lib` ）放到变量 `LD_LIBRARY_PATH` 里
+> 可在`.bashrc`中添加
+>
+> ```
+> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+> ```
+>
+> 也可以运行时
+>
+> ```
+> export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+> roslaunch lego_loam run.launch
+> ```
+>
 
-```
-sudo apt-get install libparmetis-dev
-```
-
-方法二、网上也有说因为没有把动态链接库的安装路径（例如 `/usr/local/lib` ）放到变量 `LD_LIBRARY_PATH` 里
-可在`.bashrc`中添加
-
-```
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-```
-
-也可以运行时
-
-```
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-roslaunch lego_loam run.launch
-```
-
-### loam建图配置(假设我们使用的是velodyne激光雷达)
+### 7.loam建图配置(假设我们使用的是velodyne激光雷达)
 
 1.运行loam
 
