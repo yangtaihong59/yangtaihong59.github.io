@@ -4,7 +4,7 @@ title:  虚拟机ubuntu18安装 Ros lego-loam
 subtitle: 环境配置流程
 date:   2022-08-10
 categories: ROS
-tags: [ROS环境配置 SLAM]
+tags: [ROS,环境配置,SLAM]
 ---
 
 ## 我的安装环境
@@ -20,7 +20,7 @@ ubuntu18.04
 ```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 ```
-> #### 问题 安装速度缓慢
+> **问题 安装速度缓慢**
 >
 > - **原因：** 软件源的问题
 > - **解决方案：** 登录 http://wiki.ros.org/ROS/Installation/UbuntuMirrors网站
@@ -36,7 +36,7 @@ curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo ap
 ### Installation（建议：Desktop-Full Install）
 
 ```
-sudo apt update
+ssudo apt update
 ```
 ```
 sudo apt install ros-melodic-desktop-full
@@ -59,7 +59,7 @@ rosdep update
 ```
  在执行`rosdep update` 会出现超时，主要的解决方法参考
 
-> #### 问题 超时
+> **问题 超时**
 >
 > dckwin（解决rosdep update一直timeout的问题）
 >
@@ -173,7 +173,7 @@ rosbag play *.bag --clock --topic /velodyne_points /imu/data
 ```
 至此，lego-loam编译安装结束
 
-> #### 问题 虚拟机下运行rviz时报错闪退或者跑LEGO-LOAM却只有一条路径的现象
+> **问题 虚拟机下运行rviz时报错闪退或者跑LEGO-LOAM却只有一条路径的现象**
 >
 > - 关闭硬件加速	
 >
@@ -186,7 +186,7 @@ rosbag play *.bag --clock --topic /velodyne_points /imu/data
 > - 关闭虚拟机的3D图形加速
 >
 
-> #### 问题 运行lego_loam时报错[mapOptmization-7] process has died [pid 11653, exit code 127, cmd /home/p/legoloam/dev
+> **问题 运行lego_loam时报错**`[mapOptmization-7] process has died [pid 11653, exit code 127, cmd /home/p/legoloam/dev`
 >
 > 方法一、直接安装`libparmetis-dev`即可解决
 >
@@ -233,7 +233,7 @@ rviz 选择右侧最上面Global Options列表下的Fixed Frame选择Laser _odom
 rosbag record -o out /laser_cloud_surround
 ```
 
-#或者
+或者
 
 ```
 rosbag record -o out /laser_cloud -b 40960

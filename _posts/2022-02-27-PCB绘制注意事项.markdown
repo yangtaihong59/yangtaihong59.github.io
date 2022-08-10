@@ -3,7 +3,7 @@ layout: post
 title:  PCB绘制注意事项
 date:   2022-02-27 15:26:32 +0800
 categories: 知识总结
-tags: [PCB设计，零散知识]
+tags: [PCB设计,零散知识]
 ---
 # PCB绘制
 

@@ -4,7 +4,7 @@ title:  网页VScode与Colab连接
 subtitle: 终极白嫖大法
 date:   2022-03-3
 categories: 机器学习
-tags: [深度学习环境配置]
+tags: [深度学习,环境配置]
 ---
 ## 1、简介
 
