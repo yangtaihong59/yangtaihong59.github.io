@@ -75,12 +75,16 @@ disqus:
 
 # Gitment comments
 gitment:
-  enable: true 
+  enable: true
+  mint: true 		# RECOMMEND, A mint on Gitment, to support count, language and proxy_gateway
+  count: true 		# Show comments count in post meta area
+  lazy: false 		# Comments lazy loading with a button
+  cleanly: false 	# Hide 'Powered by ...' on footer, and more
   username: "yangtaihong59"
   repo: "blog_comments"
   client_id: "ef213180e929327e765f"
   client_secret: "2b471240fb6b7524c0f9d5002a67ca835f128e58"
-  redirect_uri: "https://yangtaihong59.github.io/"
+  redirect_uri: ""
 
 # Build settings
 markdown: kramdown
