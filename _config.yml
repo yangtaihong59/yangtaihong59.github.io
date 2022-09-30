@@ -75,6 +75,7 @@ disqus:
 
 # Gitment comments
 gitment:
+  enable: true 
   username: "yangtaihong59"
   repo: "blog_comments"
   client_id: "ef213180e929327e765f"
