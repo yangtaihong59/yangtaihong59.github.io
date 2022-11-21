@@ -74,17 +74,15 @@ disqus:
   shortname: "jeffreytse"
 
 # Gitment comments
-gitment:
-  enable: true
-  mint: true 		# RECOMMEND, A mint on Gitment, to support count, language and proxy_gateway
-  count: true 		# Show comments count in post meta area
-  lazy: false 		# Comments lazy loading with a button
-  cleanly: false 	# Hide 'Powered by ...' on footer, and more
-  username: "yangtaihong59"
-  repo: "blog_comments"
-  client_id: "ef213180e929327e765f"
-  client_secret: "2b471240fb6b7524c0f9d5002a67ca835f128e58"
-  redirect_uri: "https://yangtaihong59.github.io/"
+# gitment:
+#   enable: true
+#   username: "yangtaihong59"
+#   repo: "blog_comments"
+gitment_owner: 'yangtaihong59'
+gitment_repo: 'yangtaihong59.github.io'
+gitment_oauth:
+  client_id: '837db349f56e83f8ccec'
+  client_secret: 'c0118e2232b3138c89b053f336e1ae769a13248a'
 
 # Build settings
 markdown: kramdown
