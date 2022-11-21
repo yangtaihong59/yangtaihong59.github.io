@@ -74,15 +74,18 @@ disqus:
   shortname: "jeffreytse"
 
 # Gitment comments
-# gitment:
-#   enable: true
-#   username: "yangtaihong59"
-#   repo: "blog_comments"
-gitment_owner: 'yangtaihong59'
-gitment_repo: 'yangtaihong59.github.io'
-gitment_oauth:
-  client_id: '837db349f56e83f8ccec'
-  client_secret: 'c0118e2232b3138c89b053f336e1ae769a13248a'
+gitment:
+  username: "yangtaihong59"
+  repo: "blog_comments"
+  client_id: "837db349f56e83f8ccec"
+  client_secret: "c0118e2232b3138c89b053f336e1ae769a13248a"
+  redirect_uri: "https://www.yangtaihong.xyz/"   # If you use a custom domain name
+
+# gitment_owner: 'yangtaihong59'
+# gitment_repo: 'blog_comments'
+# gitment_oauth:
+#   client_id: '837db349f56e83f8ccec'
+#   client_secret: 'c0118e2232b3138c89b053f336e1ae769a13248a'
 
 # Build settings
 markdown: kramdown
