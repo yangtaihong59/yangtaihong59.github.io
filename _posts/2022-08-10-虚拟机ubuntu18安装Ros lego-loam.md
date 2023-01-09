@@ -58,9 +58,9 @@ sudo apt install python-rosdep
 sudo rosdep init
 rosdep update
 ```
- 在执行`sudo rosdep init` 会出现境外资源被屏蔽的问题（2023..01.03）
+ 在执行`sudo rosdep init` 会出现境外资源被屏蔽的问题（2023.01.03）
  > **问题 境外资源屏蔽**
- > 直接使用 VPN [Linux 安装配置 Clash GUI 图形界面版代理上网]()
+ > 直接使用 VPN [Linux 安装配置 Clash GUI 图形界面版代理上网]https://www.yangtaihong.xyz/linux/2023/01/03/Linux-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE-Clash-GUI-%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E7%89%88%E4%BB%A3%E7%90%86%E4%B8%8A%E7%BD%91.html)
 
  在执行`rosdep update` 会出现超时，主要的解决方法参考
 
