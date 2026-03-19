@@ -22,7 +22,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   This is a  personal blog. 
 
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://yangtaihong59.github.io" # the base hostname & protocol for your site
 favicon: "/favicon.jpg" # the favicon for your site
 
 # Yat date format
@@ -96,5 +96,4 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-paginate
-  - jekyll-spaceship
   - jekyll-remote-theme
