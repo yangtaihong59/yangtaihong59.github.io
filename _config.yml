@@ -89,7 +89,7 @@ gitment:
 
 # Build settings
 markdown: kramdown
-remote_theme: jeffreytse/jekyll-theme-yat
+remote_theme: jeffreytse/jekyll-theme-yat@v1.10.0
 
 plugins:
   - jekyll-feed
